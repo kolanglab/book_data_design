@@ -1,0 +1,23 @@
+title: "言語処理系のデータ構造入門"
+author: "ligarb AI"
+language: "ja"
+ai_generated: true
+bibliography: references.bib
+chapters:
+  - cover: cover.md
+  - introduction.md
+  - part: part-internal.md
+    chapters:
+      - symbol-table.md
+      - identifier.md
+      - syntax-tree.md
+  - part: part-runtime.md
+    chapters:
+      - numbers.md
+      - strings.md
+      - arrays.md
+      - hashes.md
+      - objects.md
+      - special-types.md
+  - appendix:
+    - further-reading.md
