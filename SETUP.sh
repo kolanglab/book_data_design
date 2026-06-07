@@ -16,12 +16,6 @@ set -euo pipefail
 OWNER="kolanglab"
 REPO="book_data_design"
 
-if [ "$OWNER" = "kolanglab" ] || [ "$REPO" = "book_data_design" ]; then
-  echo "OWNER/REPO が未設定です。book.yml の repository を設定して" >&2
-  echo "'ligarb setup-github-review' を再実行するか、このスクリプトを編集してください。" >&2
-  exit 1
-fi
-
 echo "==> リポジトリ作成 + push（ブランチは master 想定）"
 git add -A
 git commit -m "Initial book" || true   # 変更が無ければスキップ
