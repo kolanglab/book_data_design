@@ -28,6 +28,7 @@ chapters:
       - lazy.md
       - time.md
       - regexp.md
+      - serialize.md
       - concurrency.md
   - part: part-quirky.md
     chapters:

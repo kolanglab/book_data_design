@@ -139,6 +139,53 @@ CPython はこのために、コンテナ系オブジェクトを連結リスト
 スタックあふれを起こすため、明示的なスタック＋あふれたときの再走査
 という防御が実装には必須です。
 
+ここまでの部品で、動くマーク＆スイープ GC が書けます。
+
+```ruby
+# 動く最小のマーク＆スイープ GC
+class GCHeap
+  Obj = Struct.new(:refs, :marked)   # refs: このオブジェクトが指す先たち
+
+  def initialize = (@objects = []; @roots = [])
+  attr_reader :roots
+
+  def allocate(refs = [])
+    obj = Obj.new(refs, false)
+    @objects << obj                  # 全オブジェクトの台帳（スイープ用）
+    obj
+  end
+
+  def collect
+    work = @roots.dup                # マークスタック
+    until work.empty?
+      obj = work.pop
+      next if obj.marked             # 訪問済みなら何もしない（循環対策）
+      obj.marked = true
+      work.concat(obj.refs)          # 子をスタックに積む
+    end
+    @objects.select!(&:marked)       # スイープ：印のないものを捨てる
+    @objects.each { |o| o.marked = false }   # 印を消して次回に備える
+  end
+
+  def live_count = @objects.size
+end
+
+heap = GCHeap.new
+a = heap.allocate                # a ← b から参照される
+b = heap.allocate([a])
+heap.allocate([])                # 誰からも参照されない孤児
+c = heap.allocate; c.refs << c   # 自分しか参照しない循環
+heap.roots << b
+heap.collect
+p heap.live_count   # => 2  b と、b から届く a だけが生き残る
+                    #        循環ごみ c も正しく回収される（参照カウントとの違い！）
+```
+
+実物との距離は「台帳とフリーリストがページ＋ビットマップになる」
+「ルートがスタック走査になる」程度で、骨格はこのままです。前節の
+循環参照の例（参照カウントでは回収できなかった `c`）が、ここでは
+何の特別扱いもなく回収されることを確かめてください。
+
 「生きている印」をどこに置くかにも設計があります。オブジェクトの
 ヘッダのビットを使うのが素朴ですが、CRuby は**ページごとのビットマップ**
 （オブジェクト本体とは別の場所にまとめた印の表）に印を付けます。
@@ -335,42 +382,11 @@ Java の `WeakReference`、Lua の弱テーブルがこれです。
 「回収すべきオブジェクトのリスト」を GC からアプリケーションへ受け渡す
 キューという、専用のデータ構造を必要とします。
 
-## ヒープを書き出す：直列化と巡回
-
-GC の話題の締めくくりに、ヒープ上のオブジェクトグラフを**外へ
-持ち出す**技術 —— **直列化**（serialization、Ruby の `Marshal`、
-Python の `pickle`、Java の serialization）に触れます。GC と同じく
-「参照をたどってグラフを巡る」仕事だからです。
-
-素朴な「再帰的に書き出す」実装は、二つの理由で破綻します。
-**共有**（同じオブジェクトが二ヶ所から参照されていたら、二度書き
-出すと復元後に別物になる）と**循環**（`a` が `b` を、`b` が `a` を
-指していたら無限ループ）です。解は GC のマークと同じで、**訪問済み
-表**を引き連れて歩くことです。
-
-```ruby
-# 概念図：巡回・共有に耐える直列化の骨格
-def serialize(obj, seen = {})
-  if (id = seen[obj.object_id])
-    return [:backref, id]          # 二度目は「さっきの n 番」とだけ書く
-  end
-  seen[obj.object_id] = seen.size  # 訪問済み表に通し番号で登録
-  [:object, obj.class.name, obj.fields.map { |f| serialize(f, seen) }]
-end
-```
-
-書く側は「オブジェクト → 通し番号」のハッシュ、読む側は「通し番号 →
-復元済みオブジェクト」の配列を持ち、**後方参照**（backreference）で
-共有と循環を再現します。`Marshal` も `pickle` も、フォーマットの
-中身はこの仕掛けです。Smalltalk の章で見るイメージや V8 の
-スナップショットは、これを**ヒープ全体**に対して、ポインタの
-再配置までこなす形で行う大規模版にあたります。
-
-ちなみにバイトコード（構文木と中間表現の章）も直列化の常連です。
-CPython の `.pyc`、CRuby の `ISeq` バイナリ（Rails の起動を速くする
-bootsnap が使っています）は、「コンパイル結果というオブジェクト
-グラフ」をファイルにキャッシュする仕組みであり、ここでも共有・
-循環・再配置という同じ問題が同じ道具で解かれています。
+なお、GC のマークと同じ「参照をたどってグラフを巡る」仕事が、
+もう一つあります。ヒープ上のオブジェクトグラフをファイルや
+ネットワークへ**書き出す**直列化（`Marshal` など）です。共有と
+循環をどう写し取るかという問題も含めて、「直列化と永続化」の章で
+まとめて扱います。
 
 ## まとめ：GCはデータ構造の総合芸術
 

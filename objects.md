@@ -169,6 +169,59 @@ end
 > JavaScript でも「コンストラクタの外でプロパティを足すな」と
 > 言われるのは同じ事情です。
 
+シェイプと遷移は、ここまでの説明をそのまま写すだけで実装できます。
+
+```ruby
+# シェイプ遷移の最小実装
+class Shape
+  def initialize(parent = nil, name = nil)
+    @fields = parent ? parent.fields.merge(name => parent.fields.size) : {}
+    @transitions = {}    # 変数名 => 遷移先シェイプ（ここが共有の要）
+  end
+  attr_reader :fields
+
+  def index_of(name) = @fields[name]
+
+  def transition(name)             # 「name を足した形」へ
+    @transitions[name] ||= Shape.new(self, name)   # 同じ遷移は一度だけ作る
+  end
+end
+
+ROOT_SHAPE = Shape.new             # 「変数を持たない形」（木の根）
+
+class ShapedObject
+  def initialize = (@shape = ROOT_SHAPE; @values = [])
+
+  def set_ivar(name, value)
+    unless (i = @shape.index_of(name))
+      @shape = @shape.transition(name)   # 未知の変数 → 形が遷移する
+      i = @shape.index_of(name)
+    end
+    @values[i] = value             # 値は名前なしの配列に置くだけ
+  end
+
+  def get_ivar(name)
+    (i = @shape.index_of(name)) && @values[i]
+  end
+  attr_reader :shape
+end
+
+u1 = ShapedObject.new
+u1.set_ivar(:@name, "Alice"); u1.set_ivar(:@age, 30)
+u2 = ShapedObject.new
+u2.set_ivar(:@name, "Bob");   u2.set_ivar(:@age, 25)
+
+p u1.shape.equal?(u2.shape)   # => true  同じ順で足したので同じ形を共有
+p u1.get_ivar(:@age)          # => 30    実体は @values[1] の配列アクセス
+```
+
+`@transitions` のキャッシュ（`||=`）が共有のすべてです。これを
+外すと、オブジェクトごとに別のシェイプができてしまい、メモリも
+インラインキャッシュ（次節）も台無しになります。逆に、変数を
+足す**順序**が違うオブジェクトは `transition` の経路が分かれ、
+別のシェイプに育つ —— 先の TIP の「いつも同じ順序で初期化せよ」が、
+この 1 行から導かれることも確かめられます。
+
 ## メソッドはどこにある：メソッド探索
 
 状態（インスタンス変数）の次は、振る舞い（メソッド）です。`u.greet` を

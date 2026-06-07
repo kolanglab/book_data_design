@@ -266,6 +266,50 @@ puts RubyVM::InstructionSequence.compile("2 + 3 * 4").disasm
 # putobject 2 / putobject 3 / putobject 4 / opt_mult / opt_plus ... のような出力
 ```
 
+このコンパイラと仮想機械は、自分で書いてみると拍子抜けするほど
+小さく作れます。コンパイルとは**木を帰りがけ順（子を先、親を後）に
+たどって命令を吐く**ことであり、`evaluate` の再帰とまったく同じ形を
+しているからです。違いは「その場で計算する」か「あとで計算する
+命令を出す」かだけです。
+
+```ruby
+# AST からバイトコードへの最小コンパイラ（前節のノードをそのまま使う）
+def compile(node, out = [])
+  case node
+  when NumberNode then out << [:push, node.value]
+  when VarNode    then out << [:load, node.name]
+  when BinOpNode
+    compile(node.left, out)    # 左の子の命令を先に
+    compile(node.right, out)   # 右の子の命令を次に
+    out << [:binop, node.op]   # 自分（演算）は最後 —— 帰りがけ順
+  end
+  out
+end
+
+# それを実行するスタック仮想機械
+def run(code, env = {})
+  stack = []
+  code.each do |op, arg|
+    case op
+    when :push  then stack.push(arg)
+    when :load  then stack.push(env.fetch(arg))
+    when :binop then b = stack.pop
+                     a = stack.pop
+                     stack.push(a.send(arg, b))
+    end
+  end
+  stack.pop
+end
+
+p compile(tree)       # => [[:push,2],[:push,3],[:push,4],[:binop,:*],[:binop,:+]]
+p run(compile(tree))  # => 14   evaluate(tree, {}) と同じ答え
+```
+
+「コンパイル時に一度だけ木をたどり、実行時は配列を走るだけ」という
+利得が、この 30 行に凝縮されています。条件分岐を足すには、ジャンプ
+命令（`[:jump_if_false, 飛び先]`）と「飛び先をあとから埋める」
+**バックパッチ**が要りますが、骨格はこのままです。
+
 ## スタック機械かレジスタ機械か
 
 バイトコードの設計には大きな流派が二つあります。上で見た**スタック
