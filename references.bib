@@ -48,6 +48,34 @@
   year = {2009}
 }
 
+@book{okasaki1998,
+  author = {Chris Okasaki},
+  title = {Purely Functional Data Structures},
+  publisher = {Cambridge University Press},
+  year = {1998}
+}
+
+@book{jones2011,
+  author = {Richard Jones and Antony Hosking and Eliot Moss},
+  title = {The Garbage Collection Handbook: The Art of Automatic Memory Management},
+  publisher = {Chapman and Hall/CRC},
+  year = {2011}
+}
+
+@book{lindholm2014,
+  author = {Tim Lindholm and Frank Yellin and Gilad Bracha and Alex Buckley},
+  title = {The Java Virtual Machine Specification, Java SE 8 Edition},
+  publisher = {Addison-Wesley},
+  year = {2014}
+}
+
+@book{goetz2006,
+  author = {Brian Goetz and Tim Peierls and Joshua Bloch and Joseph Bowbeer and David Holmes and Doug Lea},
+  title = {Java Concurrency in Practice},
+  publisher = {Addison-Wesley},
+  year = {2006}
+}
+
 @inproceedings{deutsch1984,
   author = {L. Peter Deutsch and Allan M. Schiffman},
   title = {Efficient implementation of the Smalltalk-80 system},
@@ -120,6 +148,24 @@
   doi = {10.1145/93542.93559}
 }
 
+@inproceedings{loitsch2010,
+  author = {Florian Loitsch},
+  title = {Printing floating-point numbers quickly and accurately with integers},
+  booktitle = {Proceedings of the ACM SIGPLAN 2010 Conference on Programming Language Design and Implementation (PLDI '10)},
+  pages = {233--243},
+  year = {2010},
+  doi = {10.1145/1806596.1806623}
+}
+
+@inproceedings{adams2018,
+  author = {Ulf Adams},
+  title = {Ryū: fast float-to-string conversion},
+  booktitle = {Proceedings of the ACM SIGPLAN 2018 Conference on Programming Language Design and Implementation (PLDI '18)},
+  pages = {270--282},
+  year = {2018},
+  doi = {10.1145/3192366.3192369}
+}
+
 @techreport{bagwell2001,
   author = {Phil Bagwell},
   title = {Ideal Hash Trees},
@@ -142,6 +188,13 @@
   title = {Regular Expression Matching Can Be Simple And Fast},
   year = {2007},
   url = {https://swtch.com/~rsc/regexp/regexp1.html}
+}
+
+@misc{cox2009,
+  author = {Russ Cox},
+  title = {Regular Expression Matching: the Virtual Machine Approach},
+  year = {2009},
+  url = {https://swtch.com/~rsc/regexp/regexp2.html}
 }
 
 @misc{seaton2021,
@@ -172,4 +225,563 @@
   title = {The Unicode Standard, Version 15.0},
   year = {2022},
   url = {https://www.unicode.org/versions/Unicode15.0.0/}
+}
+
+@article{mccarthy1960,
+  author = {John McCarthy},
+  title = {Recursive functions of symbolic expressions and their computation by machine, Part I},
+  journal = {Communications of the ACM},
+  volume = {3},
+  number = {4},
+  pages = {184--195},
+  year = {1960},
+  doi = {10.1145/367177.367199}
+}
+
+@article{cheney1970,
+  author = {C. J. Cheney},
+  title = {A nonrecursive list compacting algorithm},
+  journal = {Communications of the ACM},
+  volume = {13},
+  number = {11},
+  pages = {677--678},
+  year = {1970},
+  doi = {10.1145/362790.362798}
+}
+
+@inproceedings{ungar1984,
+  author = {David Ungar},
+  title = {Generation scavenging: A non-disruptive high performance storage reclamation algorithm},
+  booktitle = {Proceedings of the First ACM SIGSOFT/SIGPLAN Software Engineering Symposium on Practical Software Development Environments (SDE 1)},
+  pages = {157--167},
+  year = {1984},
+  doi = {10.1145/800020.808261}
+}
+
+@inproceedings{wilson1992,
+  author = {Paul R. Wilson},
+  title = {Uniprocessor garbage collection techniques},
+  booktitle = {Memory Management: International Workshop IWMM 92},
+  series = {Lecture Notes in Computer Science},
+  volume = {637},
+  pages = {1--42},
+  publisher = {Springer},
+  year = {1992},
+  doi = {10.1007/BFb0017182}
+}
+
+@article{boehm1988,
+  author = {Hans-Juergen Boehm and Mark Weiser},
+  title = {Garbage collection in an uncooperative environment},
+  journal = {Software: Practice and Experience},
+  volume = {18},
+  number = {9},
+  pages = {807--820},
+  year = {1988},
+  doi = {10.1002/spe.4380180902}
+}
+
+@inproceedings{sasada2019,
+  author = {Koichi Sasada},
+  title = {Gradual write-barrier insertion into a Ruby interpreter},
+  booktitle = {Proceedings of the 2019 ACM SIGPLAN International Symposium on Memory Management (ISMM 2019)},
+  pages = {115--121},
+  year = {2019},
+  doi = {10.1145/3315573.3329986}
+}
+
+@article{ierusalimschy2005,
+  author = {Roberto Ierusalimschy and Luiz Henrique de Figueiredo and Waldemar Celes},
+  title = {The implementation of Lua 5.0},
+  journal = {Journal of Universal Computer Science},
+  volume = {11},
+  number = {7},
+  pages = {1159--1176},
+  year = {2005}
+}
+
+@inproceedings{aumasson2012,
+  author = {Jean-Philippe Aumasson and Daniel J. Bernstein},
+  title = {SipHash: A fast short-input PRF},
+  booktitle = {Progress in Cryptology -- INDOCRYPT 2012},
+  series = {Lecture Notes in Computer Science},
+  volume = {7668},
+  pages = {489--508},
+  publisher = {Springer},
+  year = {2012},
+  doi = {10.1007/978-3-642-34931-7_28}
+}
+
+@misc{makarov2016,
+  author = {Vladimir Makarov},
+  title = {Feature #12142: Hash tables with open addressing},
+  note = {Ruby Issue Tracking System},
+  year = {2016},
+  url = {https://bugs.ruby-lang.org/issues/12142}
+}
+
+@misc{kulukundis2017,
+  author = {Matt Kulukundis},
+  title = {Designing a Fast, Efficient, Cache-friendly Hash Table, Step by Step},
+  note = {CppCon 2017},
+  year = {2017},
+  url = {https://www.youtube.com/watch?v=ncHmEUmJZf4}
+}
+
+@misc{pratt2025,
+  author = {Michael Pratt},
+  title = {Faster Go maps with Swiss Tables},
+  note = {The Go Blog},
+  year = {2025},
+  url = {https://go.dev/blog/swisstable}
+}
+
+@inproceedings{bolz2013,
+  author = {Carl Friedrich Bolz and Lukas Diekmann and Laurence Tratt},
+  title = {Storage strategies for collections in dynamically typed languages},
+  booktitle = {Proceedings of OOPSLA 2013},
+  pages = {167--182},
+  year = {2013},
+  doi = {10.1145/2509136.2509531}
+}
+
+@inproceedings{driesen1996,
+  author = {Karel Driesen and Urs Hölzle},
+  title = {The direct cost of virtual function calls in C++},
+  booktitle = {Proceedings of OOPSLA '96},
+  pages = {306--323},
+  year = {1996},
+  doi = {10.1145/236337.236369}
+}
+
+@inproceedings{barrett1996,
+  author = {Kim Barrett and Bob Cassels and Paul Haahr and David A. Moon and Keith Playford and P. Tucker Withington},
+  title = {A monotonic superclass linearization for Dylan},
+  booktitle = {Proceedings of OOPSLA '96},
+  pages = {69--82},
+  year = {1996},
+  doi = {10.1145/236337.236343}
+}
+
+@article{cytron1991,
+  author = {Ron Cytron and Jeanne Ferrante and Barry K. Rosen and Mark N. Wegman and F. Kenneth Zadeck},
+  title = {Efficiently computing static single assignment form and the control dependence graph},
+  journal = {ACM Transactions on Programming Languages and Systems},
+  volume = {13},
+  number = {4},
+  pages = {451--490},
+  year = {1991},
+  doi = {10.1145/115372.115320}
+}
+
+@inproceedings{cardelli1984,
+  author = {Luca Cardelli},
+  title = {Compiling a functional language},
+  booktitle = {Proceedings of the 1984 ACM Symposium on LISP and Functional Programming (LFP '84)},
+  pages = {208--217},
+  year = {1984},
+  doi = {10.1145/800055.802037}
+}
+
+@article{peytonjones1992,
+  author = {Simon L. Peyton Jones},
+  title = {Implementing lazy functional languages on stock hardware: the Spineless Tagless G-machine},
+  journal = {Journal of Functional Programming},
+  volume = {2},
+  number = {2},
+  pages = {127--202},
+  year = {1992},
+  doi = {10.1017/S0956796800000319}
+}
+
+@article{hughes1989,
+  author = {John Hughes},
+  title = {Why Functional Programming Matters},
+  journal = {The Computer Journal},
+  volume = {32},
+  number = {2},
+  pages = {98--107},
+  year = {1989},
+  doi = {10.1093/comjnl/32.2.98}
+}
+
+@article{hinze2006,
+  author = {Ralf Hinze and Ross Paterson},
+  title = {Finger trees: a simple general-purpose data structure},
+  journal = {Journal of Functional Programming},
+  volume = {16},
+  number = {2},
+  pages = {197--217},
+  year = {2006},
+  doi = {10.1017/S0956796805005769}
+}
+
+@inproceedings{schmidt1990,
+  author = {Douglas C. Schmidt},
+  title = {GPERF: A Perfect Hash Function Generator},
+  booktitle = {Proceedings of the 2nd USENIX C++ Conference},
+  pages = {87--102},
+  year = {1990}
+}
+
+@article{debruijn1972,
+  author = {Nicolaas Govert de Bruijn},
+  title = {Lambda calculus notation with nameless dummies, a tool for automatic formula manipulation, with application to the Church-Rosser theorem},
+  journal = {Indagationes Mathematicae},
+  volume = {75},
+  number = {5},
+  pages = {381--392},
+  year = {1972},
+  doi = {10.1016/1385-7258(72)90034-0}
+}
+
+@phdthesis{celis1986,
+  author = {Pedro Celis},
+  title = {Robin Hood Hashing},
+  school = {University of Waterloo},
+  year = {1986}
+}
+
+@inproceedings{chase2005,
+  author = {David Chase and Yossi Lev},
+  title = {Dynamic circular work-stealing deques},
+  booktitle = {Proceedings of the 17th ACM Symposium on Parallelism in Algorithms and Architectures (SPAA '05)},
+  pages = {21--28},
+  year = {2005},
+  doi = {10.1145/1073970.1073974}
+}
+
+@misc{pep393,
+  author = {Martin v. Löwis},
+  title = {PEP 393 -- Flexible String Representation},
+  year = {2010},
+  url = {https://peps.python.org/pep-0393/}
+}
+
+@misc{pep412,
+  author = {Mark Shannon},
+  title = {PEP 412 -- Key-Sharing Dictionary},
+  year = {2012},
+  url = {https://peps.python.org/pep-0412/}
+}
+
+@misc{pep495,
+  author = {Alexander Belopolsky and Tim Peters},
+  title = {PEP 495 -- Local Time Disambiguation},
+  year = {2015},
+  url = {https://peps.python.org/pep-0495/}
+}
+
+@misc{pep703,
+  author = {Sam Gross},
+  title = {PEP 703 -- Making the Global Interpreter Lock Optional in CPython},
+  year = {2023},
+  url = {https://peps.python.org/pep-0703/}
+}
+
+@misc{pep255,
+  author = {Neil Schemenauer and Tim Peters and Magnus Lie Hetland},
+  title = {PEP 255 -- Simple Generators},
+  year = {2001},
+  url = {https://peps.python.org/pep-0255/}
+}
+
+@misc{hettinger2012,
+  author = {Raymond Hettinger},
+  title = {More compact dictionaries with faster iteration},
+  note = {python-dev メーリングリストへの提案},
+  year = {2012},
+  url = {https://mail.python.org/pipermail/python-dev/2012-December/123028.html}
+}
+
+@misc{jep254,
+  author = {{OpenJDK Project}},
+  title = {JEP 254: Compact Strings},
+  year = {2016},
+  url = {https://openjdk.org/jeps/254}
+}
+
+@misc{bynens2017,
+  author = {Mathias Bynens},
+  title = {Elements kinds in V8},
+  note = {V8 Blog},
+  year = {2017},
+  url = {https://v8.dev/blog/elements-kinds}
+}
+
+@misc{v8pointer2020,
+  author = {Igor Sheludko and Santiago Aboy Solanes},
+  title = {Pointer Compression in V8},
+  note = {V8 Blog},
+  year = {2020},
+  url = {https://v8.dev/blog/pointer-compression}
+}
+
+@misc{wingo2011,
+  author = {Andy Wingo},
+  title = {Value Representation in JavaScript Implementations},
+  year = {2011},
+  url = {https://wingolog.org/archives/2011/05/18/value-representation-in-javascript-implementations}
+}
+
+@misc{stenman2024,
+  author = {Erik Stenman},
+  title = {The BEAM Book: Understanding the Erlang Runtime System},
+  year = {2024},
+  url = {https://blog.stenmans.org/theBeamBook/}
+}
+
+@misc{ruby32,
+  author = {{Ruby development team}},
+  title = {Ruby 3.2.0 Released},
+  year = {2022},
+  url = {https://www.ruby-lang.org/en/news/2022/12/25/ruby-3-2-0-released/}
+}
+
+@misc{cox2017,
+  author = {Russ Cox},
+  title = {Proposal: Monotonic Elapsed Time Measurements in Go},
+  year = {2017},
+  url = {https://go.googlesource.com/proposal/+/master/design/12914-monotonic.md}
+}
+
+@misc{rfc3339,
+  author = {Graham Klyne and Chris Newman},
+  title = {Date and Time on the Internet: Timestamps (RFC 3339)},
+  year = {2002},
+  url = {https://www.rfc-editor.org/rfc/rfc3339}
+}
+
+@misc{tzdb,
+  author = {Paul Eggert and Arthur David Olson},
+  title = {The IANA Time Zone Database},
+  url = {https://www.iana.org/time-zones}
+}
+
+@misc{temporal,
+  author = {{TC39}},
+  title = {Temporal: a modern date/time API for ECMAScript},
+  url = {https://tc39.es/proposal-temporal/}
+}
+
+@inproceedings{flatt2016,
+  author = {Matthew Flatt},
+  title = {Binding as sets of scopes},
+  booktitle = {Proceedings of the 43rd Annual ACM SIGPLAN-SIGACT Symposium on Principles of Programming Languages (POPL '16)},
+  pages = {705--717},
+  year = {2016},
+  doi = {10.1145/2837614.2837620}
+}
+
+@article{bezanson2017,
+  author = {Jeff Bezanson and Alan Edelman and Stefan Karpinski and Viral B. Shah},
+  title = {Julia: A fresh approach to numerical computing},
+  journal = {SIAM Review},
+  volume = {59},
+  number = {1},
+  pages = {65--98},
+  year = {2017},
+  doi = {10.1137/141000671}
+}
+
+@article{wagner1998,
+  author = {Tim A. Wagner and Susan L. Graham},
+  title = {Efficient and flexible incremental parsing},
+  journal = {ACM Transactions on Programming Languages and Systems},
+  volume = {20},
+  number = {5},
+  pages = {980--1013},
+  year = {1998},
+  doi = {10.1145/293677.293678}
+}
+
+@inproceedings{bolz2009,
+  author = {Carl Friedrich Bolz and Antonio Cuni and Maciej Fijalkowski and Armin Rigo},
+  title = {Tracing the meta-level: PyPy's tracing JIT compiler},
+  booktitle = {Proceedings of the 4th Workshop on the Implementation, Compilation, Optimization of Object-Oriented Languages and Programming Systems (ICOOOLPS '09)},
+  pages = {18--25},
+  year = {2009},
+  doi = {10.1145/1565824.1565827}
+}
+
+@article{crochemore1991,
+  author = {Maxime Crochemore and Dominique Perrin},
+  title = {Two-way string-matching},
+  journal = {Journal of the ACM},
+  volume = {38},
+  number = {3},
+  pages = {650--674},
+  year = {1991},
+  doi = {10.1145/116825.116845}
+}
+
+@inproceedings{maranget2008,
+  author = {Luc Maranget},
+  title = {Compiling pattern matching to good decision trees},
+  booktitle = {Proceedings of the 2008 ACM SIGPLAN Workshop on ML},
+  pages = {35--46},
+  year = {2008},
+  doi = {10.1145/1411304.1411311}
+}
+
+@article{brzozowski1964,
+  author = {Janusz A. Brzozowski},
+  title = {Derivatives of regular expressions},
+  journal = {Journal of the ACM},
+  volume = {11},
+  number = {4},
+  pages = {481--494},
+  year = {1964},
+  doi = {10.1145/321239.321249}
+}
+
+@article{owens2009,
+  author = {Scott Owens and John Reppy and Aaron Turon},
+  title = {Regular-expression derivatives re-examined},
+  journal = {Journal of Functional Programming},
+  volume = {19},
+  number = {2},
+  pages = {173--190},
+  year = {2009},
+  doi = {10.1017/S0956796808007090}
+}
+
+@inproceedings{varghese1987,
+  author = {George Varghese and Anthony Lauck},
+  title = {Hashed and hierarchical timing wheels: data structures for the efficient implementation of a timer facility},
+  booktitle = {Proceedings of the 11th ACM Symposium on Operating Systems Principles (SOSP '87)},
+  pages = {25--38},
+  year = {1987},
+  doi = {10.1145/41457.37504}
+}
+
+@inproceedings{holzle1992,
+  author = {Urs Hölzle and Craig Chambers and David Ungar},
+  title = {Debugging optimized code with dynamic deoptimization},
+  booktitle = {Proceedings of the ACM SIGPLAN 1992 Conference on Programming Language Design and Implementation (PLDI '92)},
+  pages = {32--43},
+  year = {1992},
+  doi = {10.1145/143095.143114}
+}
+
+@inproceedings{chevalier2015,
+  author = {Maxime Chevalier-Boisvert and Marc Feeley},
+  title = {Simple and Effective Type Check Removal through Lazy Basic Block Versioning},
+  booktitle = {29th European Conference on Object-Oriented Programming (ECOOP 2015)},
+  series = {LIPIcs},
+  volume = {37},
+  pages = {101--123},
+  year = {2015},
+  doi = {10.4230/LIPIcs.ECOOP.2015.101}
+}
+
+@misc{pep659,
+  author = {Mark Shannon},
+  title = {PEP 659 -- Specializing Adaptive Interpreter},
+  year = {2021},
+  url = {https://peps.python.org/pep-0659/}
+}
+
+@inproceedings{ford2002,
+  author = {Bryan Ford},
+  title = {Packrat parsing: simple, powerful, lazy, linear time},
+  booktitle = {Proceedings of the 7th ACM SIGPLAN International Conference on Functional Programming (ICFP '02)},
+  pages = {36--47},
+  year = {2002},
+  doi = {10.1145/581478.581483}
+}
+
+@inproceedings{blackburn2008,
+  author = {Stephen M. Blackburn and Kathryn S. McKinley},
+  title = {Immix: a mark-region garbage collector with space efficiency, fast collection, and mutator performance},
+  booktitle = {Proceedings of the ACM SIGPLAN 2008 Conference on Programming Language Design and Implementation (PLDI '08)},
+  pages = {22--32},
+  year = {2008},
+  doi = {10.1145/1375581.1375586}
+}
+
+@article{tofte1997,
+  author = {Mads Tofte and Jean-Pierre Talpin},
+  title = {Region-based memory management},
+  journal = {Information and Computation},
+  volume = {132},
+  number = {2},
+  pages = {109--176},
+  year = {1997},
+  doi = {10.1006/inco.1996.2613}
+}
+
+@misc{pep683,
+  author = {Eddie Elizondo and Eric Snow},
+  title = {PEP 683 -- Immortal Objects, Using a Fixed Refcount},
+  year = {2022},
+  url = {https://peps.python.org/pep-0683/}
+}
+
+@techreport{warren1983,
+  author = {David H. D. Warren},
+  title = {An Abstract Prolog Instruction Set},
+  number = {Technical Note 309},
+  institution = {SRI International},
+  year = {1983}
+}
+
+@book{iverson1962,
+  author = {Kenneth E. Iverson},
+  title = {A Programming Language},
+  publisher = {John Wiley and Sons},
+  year = {1962}
+}
+
+@book{goldberg1983,
+  author = {Adele Goldberg and David Robson},
+  title = {Smalltalk-80: The Language and its Implementation},
+  publisher = {Addison-Wesley},
+  year = {1983}
+}
+
+@book{ousterhout1994,
+  author = {John K. Ousterhout},
+  title = {Tcl and the Tk Toolkit},
+  publisher = {Addison-Wesley},
+  year = {1994}
+}
+
+@inproceedings{guibas1978,
+  author = {Leonidas J. Guibas and Robert Sedgewick},
+  title = {A dichromatic framework for balanced trees},
+  booktitle = {Proceedings of the 19th Annual Symposium on Foundations of Computer Science (FOCS '78)},
+  pages = {8--21},
+  year = {1978},
+  doi = {10.1109/SFCS.1978.3}
+}
+
+@article{adams1993,
+  author = {Stephen Adams},
+  title = {Efficient sets—a balancing act},
+  journal = {Journal of Functional Programming},
+  volume = {3},
+  number = {4},
+  pages = {553--561},
+  year = {1993},
+  doi = {10.1017/S0956796800000885}
+}
+
+@article{bayer1972,
+  author = {Rudolf Bayer and Edward M. McCreight},
+  title = {Organization and maintenance of large ordered indexes},
+  journal = {Acta Informatica},
+  volume = {1},
+  number = {3},
+  pages = {173--189},
+  year = {1972},
+  doi = {10.1007/BF00288683}
+}
+
+@book{griswold1996,
+  author = {Ralph E. Griswold and Madge T. Griswold},
+  title = {The Icon Programming Language},
+  edition = {3rd},
+  publisher = {Peer-to-Peer Communications},
+  year = {1996}
 }

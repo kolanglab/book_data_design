@@ -11,13 +11,39 @@ chapters:
       - symbol-table.md
       - identifier.md
       - syntax-tree.md
+      - values.md
+      - frames.md
+      - memory.md
+      - jit.md
   - part: part-runtime.md
     chapters:
       - numbers.md
       - strings.md
       - arrays.md
       - hashes.md
+      - lists.md
+      - trees.md
       - objects.md
-      - special-types.md
+      - closures.md
+      - lazy.md
+      - time.md
+      - regexp.md
+      - concurrency.md
+  - part: part-quirky.md
+    chapters:
+      - apl.md
+      - prolog.md
+      - smalltalk.md
+      - forth.md
+      - tcl.md
+      - icon.md
+      - r-lang.md
+      - php-perl.md
+  - conclusion.md
   - appendix:
     - further-reading.md
+
+repository: "https://github.com/kolanglab/book_data_design"
+
+github_review:
+  enabled: true
