@@ -99,10 +99,36 @@ Haskell で文字列出力に使われる `ShowS`（`String -> String` 型）が
 - 前リストが空になったら、後リストを**一度だけ反転**して前リストにする。
 
 反転は O(n) ですが、各要素は「積まれて、反転で運ばれて、取り出される」
-の高々 3 回しか触られないので、ならせば O(1) です。可変な配列も
-ポインタの付け替えもなしに、不変リストだけで効率的なキューができる ——
-Okasaki の教科書はこうした「純粋関数型データ構造」の宝庫で、遅延評価と
-ならし計算量の理論的な接続まで論じています [](#cite:okasaki1998)。
+の高々 3 回しか触られないので、ならせば O(1) です。
+
+```ruby
+# 二本の不変リストでキュー（配列を不変リストの代用にした最小実装）
+class PureQueue
+  def initialize(front = [], back = [])
+    @front, @back = front, back
+  end
+
+  def push(x) = PureQueue.new(@front, [x] + @back)  # 後リストの先頭に積む
+
+  def pop                       # [取り出した値, 新しいキュー] を返す
+    if @front.empty?
+      f = @back.reverse         # 前が尽きたときだけ、一度だけ反転
+      [f.first, PureQueue.new(f.drop(1), [])]
+    else
+      [@front.first, PureQueue.new(@front.drop(1), @back)]
+    end
+  end
+end
+
+q = PureQueue.new.push(1).push(2).push(3)
+v, q = q.pop; p v   # => 1   先入れ先出しになっている
+v, _ = q.pop; p v   # => 2   どの時点の q も壊れず残る（永続）
+```
+
+可変な配列もポインタの付け替えもなしに、不変リストだけで効率的な
+キューができる —— Okasaki の教科書はこうした「純粋関数型データ
+構造」の宝庫で、遅延評価とならし計算量の理論的な接続まで論じて
+います [](#cite:okasaki1998)。
 
 両端とも速い**両端キュー**（deque）になると、各言語の解はさまざまです。
 Python の `collections.deque` は固定長ブロックの双方向連結（配列型の

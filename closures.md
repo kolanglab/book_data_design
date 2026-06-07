@@ -128,7 +128,45 @@ graph LR
 ことです。だからどのクロージャから書き換えても、他のクロージャに
 見えます（共有された可変状態としてのクロージャ変数）。「逃げるかも
 しれない変数」を一個ずつ箱に包み、スコープ終了時に箱ごと独立させる ——
-変数単位のきめ細かいエスケープ処理です。
+変数単位のきめ細かいエスケープ処理です。動きを Ruby で再現して
+みましょう。
+
+```ruby
+# Lua 流 upvalue（open → closed）の動きを再現する
+class Upvalue
+  def initialize(stack, index) = (@stack = stack; @index = index)  # open で誕生
+
+  def value
+    @stack ? @stack[@index] : @closed
+  end
+
+  def value=(v)
+    if @stack then @stack[@index] = v else @closed = v end
+  end
+
+  def close!                     # スコープ終了：スタックから値を引き取る
+    @closed = @stack[@index]
+    @stack = nil
+  end
+end
+
+stack = [10]                     # フレーム上のローカル変数 x のつもり
+uv  = Upvalue.new(stack, 0)
+inc = -> { uv.value += 1 }       # 二つのクロージャが同じ upvalue を共有
+get = -> { uv.value }
+
+inc.call
+p stack[0]    # => 11  open の間はスタックを直接読み書き（速い）
+uv.close!                        # ここでフレームが消えたことにする
+stack[0] = 99                    # 元のスロットはもう無関係
+inc.call
+p get.call    # => 12  closed 後も、二つのクロージャは同じ箱を見続ける
+```
+
+実物の Lua はさらに、open な upvalue を「スタック位置の降順の
+連結リスト」で管理し、同じ変数への upvalue を二重に作らない・
+スコープ終了時にそこから先をまとめて閉じる、という管理を加えて
+います [](#cite:ierusalimschy2005)。
 
 ## 何を捕まえるか：参照か、値か
 

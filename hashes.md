@@ -181,6 +181,58 @@ p h.keys   # => [:c, :a, :b]   入れた順に並ぶ
 索引配列に入るのは添字だけなので、表が小さいうちは 1 マス 1 バイトで
 済み、メモリも大きく節約できます。
 
+この二段構えも、骨格だけなら短く実装できます。
+
+```ruby
+# 挿入順ハッシュ（索引＋エントリ配列）の最小実装
+class OrderedDict
+  def initialize
+    @index   = Array.new(8)   # ハッシュ表側：エントリ配列の添字だけが入る
+    @entries = []             # 実データ [ハッシュ値, キー, 値] を挿入順に
+  end
+
+  def find_slot(key, h)       # 線形探索のオープンアドレス法
+    i = h % @index.size
+    until @index[i].nil?
+      e = @entries[@index[i]]
+      return i if e[0] == h && e[1].eql?(key)   # まずハッシュ値で粗く比較
+      i = (i + 1) % @index.size
+    end
+    i                         # 空きスロット
+  end
+
+  def []=(key, value)
+    h = key.hash
+    i = find_slot(key, h)
+    return @entries[@index[i]][2] = value if @index[i]   # 上書き
+    if (@entries.size + 1) * 4 > @index.size * 3         # 負荷率 3/4 で拡張
+      @index = Array.new(@index.size * 2)                # 索引だけ作り直し！
+      @entries.each_with_index { |e, n| @index[find_slot(e[1], e[0])] = n }
+      i = find_slot(key, h)
+    end
+    @index[i] = @entries.size
+    @entries << [h, key, value]
+  end
+
+  def [](key)
+    n = @index[find_slot(key, key.hash)]
+    n && @entries[n][2]
+  end
+
+  def each_pair = @entries.each { |_, k, v| yield k, v }  # 挿入順そのまま
+end
+
+d = OrderedDict.new
+d[:c] = 1; d[:a] = 2; d[:b] = 3; d[:a] = 20
+d.each_pair { |k, v| print k, "=", v, " " }   # => c=1 a=20 b=3
+```
+
+再ハッシュ時に**エントリ配列にはいっさい触らず、索引だけを作り
+直している**点が、この設計の利得の凝縮です（エントリにはハッシュ値が
+記録済みなので再計算も不要）。削除は、エントリ配列に「空き」の印を
+残して索引から外すだけにして、空きが溜まったら詰め直す ——
+オープンアドレス法のトゥームストーンと同じ扱いになります。
+
 この設計は CPython の dict（Hettinger の提案によるコンパクト辞書
 [](#cite:hettinger2012)）と、CRuby 2.4 以降の `st_table`（Makarov に
 よる全面改修 [](#cite:makarov2016)）がそれぞれ採用したもので、
