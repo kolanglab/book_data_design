@@ -91,6 +91,47 @@ RUBY
 # getlocal x@0 / setlocal y@1 のような「名前@番号」が見える
 ```
 
+関数呼び出しを持つ VM を自分で書くと、「フレーム」の正体が
+具体物になります。制御フレームの列＋共有の値スタック、という
+CRuby と同じ構成の最小版です。
+
+```ruby
+# 関数呼び出しつきミニ VM
+def vm_run(funcs, entry)
+  stack  = []                            # 値スタック（全フレームで共有）
+  frames = [[funcs[entry], 0, []]]       # 制御フレーム: [関数, pc, ローカル]
+  until frames.empty?
+    frame = frames.last
+    func, pc = frame[0], frame[1]
+    insn = func[:code][pc]
+    frame[1] += 1                        # pc を進めてから実行
+    case insn[0]
+    when :push then stack << insn[1]
+    when :load then stack << frame[2][insn[1]]   # ローカルは番号で引く
+    when :add  then stack << stack.pop + stack.pop
+    when :call
+      callee = funcs[insn[1]]
+      args = stack.pop(callee[:argc])    # 引数は値スタック経由で受け渡し
+      frames << [callee, 0, args]        # 新しいフレームを積む
+    when :ret
+      frames.pop                         # フレームを降ろすだけで「復帰」
+    end
+  end
+  stack.pop
+end
+
+funcs = {
+  "double" => { argc: 1, code: [[:load, 0], [:load, 0], [:add], [:ret]] },
+  "main"   => { argc: 0, code: [[:push, 21], [:call, "double"], [:ret]] },
+}
+p vm_run(funcs, "main")   # => 42
+```
+
+「戻り先」を覚える仕事を、フレーム配列の**形そのもの**（`pop` すれば
+一つ外側の `pc` の続きに戻る）がやっていることに注目してください。
+ここに「ローカル数を超えた `load` の検査」や「フレーム数の上限」を
+足せば、スタックあふれ検出（後述）も数行です。
+
 ## ヒープに置かれるフレーム：Python の選択
 
 フレームは必ずスタックに置かれるとは限りません。CPython は長らく、

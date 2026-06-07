@@ -168,6 +168,39 @@ graph TD
     B --> E["タグ + 32bit 整数"]
 ```
 
+ビット操作の中身は、Ruby の整数を 64 ビットの箱に見立てれば
+そのまま実験できます。
+
+```ruby
+# NaN ボクシングの encode / decode
+QNAN = 0x7ff8_0000_0000_0000      # quiet NaN の基本ビットパターン
+TAGS = { int: 1, ptr: 2 }         # NaN 空間の中の種別（ビット48-49を使う）
+
+def box_double(f) = [f].pack("D").unpack1("Q")   # double はビットそのまま
+def box_int(i)    = QNAN | (TAGS[:int] << 48) | (i & 0xffff_ffff)
+def box_ptr(a)    = QNAN | (TAGS[:ptr] << 48) | a   # 下位48bitに収まる前提
+
+def kind(v)
+  return :double if (v & QNAN) != QNAN   # NaN 空間の外 → ふつうの数
+  case (v >> 48) & 0x3
+  when TAGS[:int] then :int
+  when TAGS[:ptr] then :ptr
+  else :double                            # タグなし＝本物の NaN
+  end
+end
+
+def unbox_double(v) = [v].pack("Q").unpack1("D")
+def unbox_int(v)    = (i = v & 0xffff_ffff) >= 1 << 31 ? i - (1 << 32) : i
+
+v = box_double(3.14)
+p [kind(v), unbox_double(v)]      # => [:double, 3.14]  変換コストゼロ
+w = box_int(-42)
+p [kind(w), unbox_int(w)]         # => [:int, -42]
+p kind(box_double(0.0 / 0.0))     # => :double  本物の NaN は数のまま
+```
+
+double の照合（`kind` の 1 行目）が**マスクと比較だけ**で済むこと、
+本物の NaN がタグなし領域に自然に落ちることを確かめてください。
 NaN ボクシングは SpiderMonkey（Firefox）、JavaScriptCore（Safari）、
 LuaJIT などが採用しています。利点は**浮動小数点数の演算が一切の変換なしで
 できる**こと。タグ付きポインタ方式（Flonum）が浮動小数点数のために

@@ -222,8 +222,53 @@ graph TD
     N1 --> L["変更した要素"]
 ```
 
-枝を共有することで、1 要素の変更が、配列全体ではなく木の高さぶん、
-すなわち O(log n) のノード生成で済みます。32 分木なら木はとても浅くなる
+経路コピーは、見た目より簡単に実装できます（説明用に 4 分木）。
+
+```ruby
+# 経路コピーによる永続ベクタ（1 段 2 ビット＝4 分木、固定深さ）
+BITS = 2
+WIDTH = 1 << BITS
+
+class PVec
+  def initialize(depth, root) = (@depth = depth; @root = root)
+  attr_reader :root
+
+  def self.zeros(depth)             # 全要素 0 の木（4^depth 要素）
+    node = 0
+    depth.times { node = Array.new(WIDTH, node) }
+    new(depth, node)
+  end
+
+  def [](i)                         # 添字のビットを上位から使って降りる
+    node = @root
+    ((@depth - 1) * BITS).step(0, -BITS) { |sh| node = node[(i >> sh) & (WIDTH - 1)] }
+    node
+  end
+
+  def set(i, v)                     # 変更：根から葉までの経路だけ複製
+    PVec.new(@depth, set_node(@root, @depth, i, v))
+  end
+
+  private def set_node(node, depth, i, v)
+    return v if depth.zero?
+    sh = (depth - 1) * BITS
+    k = (i >> sh) & (WIDTH - 1)
+    copy = node.dup                 # この段の 1 ノードだけ複製
+    copy[k] = set_node(node[k], depth - 1, i, v)
+    copy
+  end
+end
+
+v1 = PVec.zeros(3)                  # 64 要素
+v2 = v1.set(37, :x)
+p [v1[37], v2[37]]                  # => [0, :x]  旧版は無傷
+p v1.root[0].equal?(v2.root[0])     # => true  触れていない枝は丸ごと共有！
+```
+
+複製されるのは深さぶんの 3 ノードだけで、残りの枝は `equal?` が
+示すとおり**同じ実体**です。枝を共有することで、1 要素の変更が、
+配列全体ではなく木の高さぶん、すなわち O(log n) のノード生成で
+済みます。32 分木なら木はとても浅くなる
 （要素 10 億個でも高さ 6 程度）ので、実用上はほぼ一定時間に感じられます。
 こうして「変更しても元が残る」性質と「そこそこの速度」を両立させるのが
 永続データ構造の妙です。Bagwell はこの構造でハッシュ表もベクタも効率よく

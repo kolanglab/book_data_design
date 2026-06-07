@@ -42,6 +42,40 @@ JIT の第一の問いは「**どこを**コンパイルするか」です。コ
 （`BINARY_OP_ADD_INT` など）に**置き換えて**いきます
 [](#cite:pep659)。
 
+quickening（構文木と中間表現の章）の核 ——「命令が観測結果で
+自分自身を書き換える」—— は、玩具で再現できます。
+
+```ruby
+# 自己書き換えする加算命令（quickening の玩具）
+def execute(code, stack)
+  pc = 0
+  while (insn = code[pc])
+    case insn[0]
+    when :push then stack << insn[1]
+    when :add                            # 汎用版：型を調べてから足す
+      b, a = stack.pop, stack.pop
+      code[pc] = [:add_int] if a.is_a?(Integer) && b.is_a?(Integer)
+      stack << a + b                     # ↑ 観測した型で命令列を書き換える
+    when :add_int                        # 特殊化版：整数前提の高速経路
+      b, a = stack.pop, stack.pop
+      code[pc] = [:add] unless a.is_a?(Integer) && b.is_a?(Integer)
+      stack << a + b                     # ↑ 賭けが外れたら汎用版へ戻す
+    end
+    pc += 1
+  end
+  stack.pop
+end
+
+code = [[:push, 1], [:push, 2], [:add]]
+p execute(code, [])    # => 3
+p code[2]              # => [:add_int]  命令列が書き換わっている！
+```
+
+本物（CPython 3.11 など）の `add_int` は型検査の後に**タグ付きの
+まま加算する**ような専用機械語級の経路を通るので利得が出ます。
+ここで見るべきは仕掛けのほう —— **命令列という配列が、実行統計を
+記録する可変のデータ構造を兼ねている**ことです。
+
 > [!NOTE]
 > ここに美しい再利用があります。インラインキャッシュ
 > [](#cite:deutsch1984) はもともと「2 回目以降を速くする」ための
