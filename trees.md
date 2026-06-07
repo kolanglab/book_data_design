@@ -48,6 +48,58 @@ O(log n) に**保ち続ける**仕組み —— 平衡化 —— が必要にな
 済むローカルな手術で、BST の規律（左小・右大）を壊しません。
 あらゆる平衡木は「いつ・どこで回転するか」の規則の違いです。
 
+AVL 木なら、回転を含めた挿入が 40 行で書けます。
+
+```ruby
+# AVL 木：高さの差が 2 になったら回転で直す
+AVLNode = Struct.new(:key, :left, :right, :height)
+
+def h(n) = n ? n.height : 0
+def renew(n) = (n.height = 1 + [h(n.left), h(n.right)].max; n)
+def bal(n) = h(n.left) - h(n.right)
+
+def rot_right(y)             #     y          x
+  x = y.left                 #    x ?   =>   ? y
+  y.left = x.right           #   ? ?           ? ?
+  x.right = renew(y)
+  renew(x)
+end
+
+def rot_left(x)              # rot_right の鏡像
+  y = x.right
+  x.right = y.left
+  y.left = renew(x)
+  renew(y)
+end
+
+def avl_insert(n, key)
+  return AVLNode.new(key, nil, nil, 1) unless n
+  if    key < n.key then n.left  = avl_insert(n.left, key)
+  elsif key > n.key then n.right = avl_insert(n.right, key)
+  else  return n
+  end
+  renew(n)
+  if bal(n) > 1                                   # 左が重すぎる
+    n.left = rot_left(n.left) if bal(n.left) < 0  # 左の右が原因なら一捻り（LR）
+    rot_right(n)
+  elsif bal(n) < -1                               # 右が重すぎる（鏡像）
+    n.right = rot_right(n.right) if bal(n.right) > 0
+    rot_left(n)
+  else
+    n
+  end
+end
+
+root = nil
+(1..1023).each { |k| root = avl_insert(root, k) }  # 整列済みの最悪入力
+p h(root)   # => 10〜のはず（素朴な BST なら高さ 1023 の鎖になる）
+```
+
+挿入で再帰から戻りながら各ノードの高さを更新し、差が 2 になった
+最初の場所で 1〜2 回回転する —— それだけで、整列済み入力という
+最悪ケースでも高さが対数に保たれます。LR・RL の「一捻り」が
+必要になる理由は、紙にケースを 4 つ描いてみるのが一番早いです。
+
 ## AVL と赤黒木：規律の厳しさという設計判断
 
 最古の平衡木が **AVL 木**（1962 年）です。「どのノードでも左右の

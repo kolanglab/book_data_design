@@ -227,6 +227,46 @@ graph TD
 編集が現実的になります。Boehm らは、汎用の文字列としてロープが従来の
 連続表現より優れる場面が多いと論じています [](#cite:boehm1995)。
 
+骨格は驚くほど小さく書けます。
+
+```ruby
+# 動く最小のロープ
+class Rope
+  Leaf   = Struct.new(:str)
+  Concat = Struct.new(:left, :right, :weight)   # weight = 左部分木の長さ
+
+  def initialize(node) = @node = node
+  def self.of(s) = new(Leaf.new(s))
+  attr_reader :node
+
+  def length(n = @node)
+    n.is_a?(Leaf) ? n.str.length : n.weight + length(n.right)
+  end
+
+  def +(other)              # 連結：両者をコピーせず、ノードを 1 個作るだけ
+    Rope.new(Concat.new(@node, other.node, length))
+  end
+
+  def [](i, n = @node)      # i 文字目：weight を道しるべに木を降りる
+    return n.str[i] if n.is_a?(Leaf)
+    i < n.weight ? self[i, n.left] : self[i - n.weight, n.right]
+  end
+
+  def to_s(n = @node)       # 平坦化（一本の文字列が必要になったら）
+    n.is_a?(Leaf) ? n.str : to_s(n.left) + to_s(n.right)
+  end
+end
+
+r = Rope.of("Hello") + Rope.of(" ") + Rope.of("World")
+p r[6]      # => "W"   コピーは一度も起きていない
+p r.to_s    # => "Hello World"
+```
+
+`+` が O(1)（ノード 1 個の生成）であること、`[]` が weight の比較で
+左右どちらかにしか降りないことを確かめてください。実用にはあと二つ、
+偏った木を直す**再平衡**（「平衡木」の章）と、短すぎる葉の**結合**が
+要りますが、それも木の操作の標準部品です。
+
 そして驚くべきことに、あなたはロープを毎日使っています。V8
 （JavaScript）は `a + b` の結果をすぐにはコピーせず、**ConsString** と
 いう「左と右を指すだけのノード」を返します。まさにロープの連結ノード

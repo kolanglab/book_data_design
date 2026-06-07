@@ -199,6 +199,50 @@ end
 加えて「捕捉位置の配列」をスレッドに持たせるだけです（同じ pc に
 複数スレッドが来たら、優先順位の高い方だけ残します）。
 
+残る部品は「パターンの構文木 → この命令列」のコンパイラですが、
+これも Thompson 構成をそのまま命令の発行に置き換えるだけです。
+構文木の章で予告した**バックパッチ**（飛び先をあとから埋める）が、
+ここで実際に登場します。
+
+```ruby
+# 構文木 → Pike VM 命令列（Thompson 構成のバイトコード版）
+def rcompile(re, prog = [])
+  case re
+  in [:char, c]   then prog << [:char, c]
+  in [:cat, a, b] then rcompile(a, prog)
+                       rcompile(b, prog)
+  in [:alt, a, b]
+    sp = prog.size
+    prog << [:split, nil, nil]      # 飛び先は未定のまま置く
+    rcompile(a, prog)
+    jp = prog.size
+    prog << [:jmp, nil]
+    prog[sp][1] = sp + 1
+    prog[sp][2] = prog.size         # ← b の開始位置が分かった瞬間に埋める
+    rcompile(b, prog)
+    prog[jp][1] = prog.size         # ← 合流点をあとから埋める（バックパッチ）
+  in [:star, a]
+    sp = prog.size
+    prog << [:split, sp + 1, nil]
+    rcompile(a, prog)
+    prog << [:jmp, sp]
+    prog[sp][2] = prog.size         # ループ脱出先を埋める
+  end
+  prog
+end
+
+def compile_regex(re) = rcompile(re) << [:match]
+
+re = [:cat, [:char, "a"],
+      [:cat, [:star, [:alt, [:char, "b"], [:char, "c"]]], [:char, "d"]]]
+p pike_match?(compile_regex(re), "abcbd")   # => true
+```
+
+構文木（パース）、コンパイル（バックパッチ付き命令生成）、実行器
+（Pike VM）—— 100 行に満たないこの三点セットは、そのまま本書
+第I部のミニチュアです。手元で拡張する（`?` や `+` を足す、捕捉を
+足す）には最適の演習になります。
+
 | 方式 | 時間 | 後方参照等 | 採用例 |
 |---|---|---|---|
 | バックトラック VM | 最悪指数 | ○ | Perl, Python, Java, Onigmo, V8 |
