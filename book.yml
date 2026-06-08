@@ -15,6 +15,7 @@ chapters:
       - frames.md
       - memory.md
       - jit.md
+      - modules.md
   - part: part-runtime.md
     chapters:
       - numbers.md
