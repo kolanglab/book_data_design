@@ -417,6 +417,62 @@ L_ADD:  ...; goto *table[*pc++];   /* 分岐点が命令数ぶんに分散する
 > 安全に検証できる」ことを最優先に、表現の自由を意図的に削った
 > 設計で、AST・バイトコード・機械語の中間に新しい点を打ちました。
 
+## 等価なプログラムを一枚に：e-graph
+
+最適化は突き詰めると**書き換え**です ── `x * 2` を `x << 1` に、`(a+b)+c` を
+`a+(b+c)` に。ところが素朴に書き換えると**順序の呪い**にかかります。ある
+規則を当てると別の規則が当たらなくなり、「どの順で書き換えるか」で結果が
+変わる（phase ordering 問題）。これを解くのが **e-graph（equality graph、
+等価グラフ）** ── **多数の等価なプログラムを一枚のグラフにまとめて持つ**
+データ構造です。
+
+部品は三つ。**e-node** は「演算子＋子への参照」ですが、子は直接のノードでは
+なく **e-class の id** を指します（`x*2` なら `*`／子＝[x の class, 2 の class]）。
+**e-class** は**互いに等しいと証明された e-node の集合**で、`x*2` の class に
+あとで `x<<1` の e-node が同居しうる。そして規則が「この二つの class は
+等しい」と示すたび **union-find**（平衡木の章）で class を併合し、同じ
+e-node が二度現れないよう **hashcons**（識別子の章のインターン）で正規化
+します。
+
+```ruby
+# e-graph の芯：union-find で class を併合、hashcons で e-node を一意化
+class EGraph
+  def initialize = (@uf = []; @memo = {})
+  def find(c) = @uf[c] == c ? c : (@uf[c] = find(@uf[c]))   # 経路圧縮
+  def add(op, *children)
+    key = [op, children.map { |c| find(c) }]   # 子を class の代表で正規化
+    return @memo[key] if @memo[key]            # hashcons：既出なら使い回す
+    id = @uf.size; @uf << id                   # 新しい class
+    @memo[key] = id
+  end
+  def merge(a, b) = (@uf[find(a)] = find(b))   # 二つの class を等しいとする
+end
+
+g = EGraph.new
+x = g.add(:x); two = g.add(:lit2)
+m = g.add(:mul, x, two)               # x * 2
+s = g.add(:shl, x, g.add(:lit1))      # x << 1
+g.merge(m, s)                         # 規則 x*2 == x<<1 を等式として加える
+p g.find(m) == g.find(s)              # => true   同じ class になった
+p g.add(:mul, x, two) == m            # => true   同じ e-node は同じ class
+```
+
+肝は **合同（congruence）**です。「`f(a)` と `f(b)` があって `a` と `b` の class が
+等しくなった」なら `f(a)` と `f(b)` も等しいはず ── この「等しい引数からは
+等しい結果」を保つよう、併合のたびにグラフを**再構築**します（上の最小実装は
+この再構築を省いています）。これは SMT ソルバの合同閉包と同じ仕掛けです。
+進め方が **等式飽和（equality saturation）**で、**すべての**書き換え規則を
+繰り返し当て、書き換え後を新しい e-node として**追加して元の class と
+union するだけ**。書き換えが決して**破壊しない**ので順序を選ぶ必要が消え、
+新しい等式が出なくなったら（飽和）各 class からコスト最小の代表を
+**抽出**して最適化結果を取り出します。一枚の e-graph は class による共有で、
+**指数的に多くの等価プログラムを多項式サイズ**で持てます ── フラットな AST
+（前述）や直列化の章の共有が、最適化の世界で極まった形です。Rust の egg、
+浮動小数点の精度を直す Herbie、テンソルを書き換える ML コンパイラ、
+Cranelift の ægraph などが採用しています。「同じプログラムを目的ごとに別の
+構造へ写す」と述べましたが、e-graph は**写し替えず、ありうる姿を全部
+同時に持つ**という、もう一段過激な選択なのです。
+
 ## 木構造の応用は広い
 
 AST に限らず、木は処理系のいたるところに現れます。
