@@ -1,4 +1,5 @@
 title: "言語処理系のデータ構造入門"
+description: "シンボルテーブル・AST・値表現など処理系内部のデータ構造から、文字列・配列・ハッシュなど言語が提供するデータ型の実装まで"
 author: "ligarb AI"
 language: "ja"
 ai_generated: true
