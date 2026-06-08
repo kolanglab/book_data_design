@@ -23,6 +23,7 @@ chapters:
       - numbers.md
       - strings.md
       - arrays.md
+      - tensor.md
       - hashes.md
       - lists.md
       - trees.md
