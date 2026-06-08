@@ -125,4 +125,97 @@ raise unless table.deref(ref1) == "new object"
 raise unless table.deref(ref2) == "new object"
 raise unless table.deref(b) == "old object"   # two-way swap
 
+# closures.md: async/await の手動脱糖（状態機械）
+class FetchSum
+  Await = Struct.new(:url)
+  Done  = Struct.new(:value)
+
+  def initialize = @state = :start
+
+  def resume(result = nil)
+    case @state
+    when :start
+      @state = :wait_a
+      Await.new("a.example")
+    when :wait_a
+      @a = result
+      @state = :wait_b
+      Await.new("b.example")
+    when :wait_b
+      @state = :done
+      Done.new(@a + result)
+    end
+  end
+end
+
+task = FetchSum.new
+step = task.resume
+while step.is_a?(FetchSum::Await)
+  result = step.url.length
+  step = task.resume(result)
+end
+raise unless step.value == 18
+raise unless task.instance_variable_get(:@state) == :done
+
+# concurrency.md: 楽観的 STM の最小実装
+class TVar
+  attr_accessor :value, :version
+  def initialize(v) = (@value = v; @version = 0)
+end
+
+COMMIT_LOCK = Mutex.new
+
+def atomically
+  loop do
+    tx = { reads: {}, writes: {} }
+    result = yield tx
+    ok = COMMIT_LOCK.synchronize do
+      if tx[:reads].all? { |tvar, ver| tvar.version == ver }
+        tx[:writes].each { |tvar, v| tvar.value = v; tvar.version += 1 }
+        true
+      end
+    end
+    return result if ok
+  end
+end
+
+def tx_read(tx, tvar)
+  return tx[:writes][tvar] if tx[:writes].key?(tvar)
+  tx[:reads][tvar] = tvar.version unless tx[:reads].key?(tvar)
+  tvar.value
+end
+
+def tx_write(tx, tvar, v) = tx[:writes][tvar] = v
+
+acc_a = TVar.new(100)
+acc_b = TVar.new(0)
+10.times.map {
+  Thread.new do
+    10.times do
+      atomically do |tx|
+        tx_write(tx, acc_a, tx_read(tx, acc_a) - 1)
+        tx_write(tx, acc_b, tx_read(tx, acc_b) + 1)
+      end
+    end
+  end
+}.each(&:join)
+raise unless [acc_a.value, acc_b.value] == [0, 100]
+
+# time.md: Time.at の in: は固定オフセットのみ受け付ける
+t = Time.at(1780890896, in: "+09:00")
+raise unless t.to_s == "2026-06-08 12:54:56 +0900"
+raise unless Time.at(1780890896, in: "+01:00").to_s == "2026-06-08 04:54:56 +0100"
+begin
+  Time.at(1780890896, in: "Asia/Tokyo")   # ゾーン名は不可（本文の記述どおり）
+  raise "Time.at should reject IANA zone names"
+rescue ArgumentError
+end
+
+# time.md: ISO 8601 の辞書順=時刻順は、オフセット混在では壊れる
+require "time"
+iso_a = "2026-06-08T09:00:00+09:00"
+iso_b = "2026-06-08T00:30:00Z"
+raise unless Time.parse(iso_a) < Time.parse(iso_b)  # 時刻としては a が前
+raise unless (iso_a <=> iso_b) > 0                  # 文字列としては a が後
+
 puts "ALL OK (iteration 12)"
