@@ -43,6 +43,7 @@ chapters:
       - icon.md
       - r-lang.md
       - php-perl.md
+      - lua.md
   - conclusion.md
   - appendix:
     - further-reading.md
