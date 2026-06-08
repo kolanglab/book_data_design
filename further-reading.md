@@ -14,7 +14,7 @@
   各章の話が、実装として一本につながります。Web 上で全文が公開されています。
 - Abelson, Sussman, *Structure and Interpretation of Computer Programs*
   [](#cite:abelson1996) は、「評価器」を題材に、プログラムの意味とは何かを
-  根本から問い直す古典です。環境のもとでの評価、ストリーム（遅延評価の章）の
+  根本から問い直す古典です。環境のもとでの評価、ストリーム（[遅延評価の章](lazy.md)）の
   源流です。
 - Aho, Lam, Sethi, Ullman, *Compilers: Principles, Techniques, and Tools*
   [](#cite:aho2006)（通称 Dragon Book）は、字句解析・構文解析・最適化を
