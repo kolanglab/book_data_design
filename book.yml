@@ -31,6 +31,7 @@ chapters:
       - regexp.md
       - serialize.md
       - concurrency.md
+      - gil.md
   - part: part-quirky.md
     chapters:
       - apl.md
