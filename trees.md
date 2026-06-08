@@ -29,10 +29,10 @@ C++ の `std::map`、Java の `TreeMap`、OCaml の `Map`、Haskell の
 
 ```mermaid
 graph TD
-    subgraph 退化した木（1,2,3,4 を順に挿入）
+    subgraph "退化した木（1,2,3,4 を順に挿入）"
       A1["1"] --> A2["2"] --> A3["3"] --> A4["4"]
     end
-    subgraph 平衡な木（同じ中身）
+    subgraph "平衡な木（同じ中身）"
       B2["2"] --> B1["1"]
       B2 --> B3["3"] --> B4["4"]
     end
