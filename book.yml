@@ -44,6 +44,7 @@ chapters:
       - r-lang.md
       - php-perl.md
       - lua.md
+      - lisp.md
   - conclusion.md
   - appendix:
     - further-reading.md
