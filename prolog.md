@@ -38,6 +38,7 @@ class LogicVar
 
   def bound? = !@ref.equal?(self)
   def bind(term) = @ref = term
+  def unbind = @ref = self              # 巻き戻し用（後述のトレイルが使う）
 
   def deref                              # ポインタの鎖を末端までたどる
     v = self
@@ -137,6 +138,33 @@ graph TB
     end
     CP["選択点：高さ1で記録"] -.巻き戻し.-> T2
 ```
+
+巻き戻しまで含めた探索は、こう動きます。
+
+```ruby
+# 選択点とトレイル：失敗したら束縛を巻き戻して次の候補を試す
+x = LogicVar.new
+goal = Compound.new(:color, [x])
+candidates = [Compound.new(:color, [:red]),
+              Compound.new(:color, [:green])]
+
+trail = []
+found = nil
+candidates.each do |head|
+  mark = trail.size                        # 選択点：足跡の高さを記録
+  if unify(goal, head, trail) && x.deref == :green  # 追加条件で失敗させる
+    found = x.deref
+    break
+  end
+  trail.pop.unbind while trail.size > mark # ★ 失敗：mark まで巻き戻す
+end
+p found      # => :green   red への束縛は取り消されてから green を試した
+```
+
+1 候補目で `x` はいったん `:red` に束縛されますが、続く条件で失敗し、
+トレイルの巻き戻しで**未束縛に戻ってから** 2 候補目に進みます。
+この `mark` までの巻き戻しが、Prolog の別解探索（`;`）や正規表現の
+バックトラックの一回ぶんに相当します。
 
 つまり Prolog 処理系は、**「取り消し可能な代入」をデータ構造として
 実装している**のです。スタックとフレームの章で見た「実行状態の保存と

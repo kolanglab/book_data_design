@@ -59,6 +59,69 @@ Forth の「メモリ」は**辞書**（dictionary）と呼ばれる一本の連
 GC を持たない Forth のメモリ管理は、この「積んで、まとめて切り戻す」
 だけで成立しています。
 
+スタックと辞書しかない言語は、インタプリタも一画面で書けます。
+
+```ruby
+# ひと画面 Forth：データスタック＋辞書
+class MiniForth
+  def initialize
+    @stack = []
+    @dict = {
+      "+"   => -> { @stack << @stack.pop + @stack.pop },
+      "*"   => -> { @stack << @stack.pop * @stack.pop },
+      "dup" => -> { @stack << @stack.last },
+      "."   => -> { print @stack.pop, " " },
+    }
+  end
+  attr_reader :stack
+
+  def make_word(src) = -> { run(src) }   # 本体を「値で」捕まえる（後述）
+
+  def run(src)
+    words = src.split                 # 字句解析は split だけ！
+    until words.empty?
+      w = words.shift
+      if w == ":"                     # コロン定義：; までを本体として登録
+        name = words.shift
+        body = words.take_while { |t| t != ";" }
+        words.shift(body.size + 1)
+        @dict[name] = make_word(body.join(" "))    # 定義＝辞書への追記
+      elsif (impl = @dict[w])
+        impl.call
+      else
+        @stack << Integer(w)          # 辞書になければ数とみなす
+      end
+    end
+  end
+end
+
+f = MiniForth.new
+f.run(": square dup * ;   5 square 3 +")
+p f.stack   # => [28]
+```
+
+構文解析も構文木もなく、`split` と辞書引きだけで言語が立ち上がる
+ことを確かめてください。
+
+> [!CAUTION]
+> 地味な顔をした `make_word` が、実はバグ除けです。素直に
+> `@dict[name] = -> { run(body.join(" ")) }` と書くと、ループ内の
+> **同じ変数 `body`** をすべての定義のラムダが共有してしまい、
+> 二つ目のワードを定義した瞬間に一つ目のワードの本体まで
+> すり替わります（実際、本書の初稿はこのバグを踏みました）。
+> メソッド呼び出しの引数は呼び出しごとに新しい束縛なので、
+> `make_word(…)` に通すことで「値で」捕まえられます ——
+> 「クロージャと関数」の章で見た**ループ変数の捕獲問題**の、
+> 生きた実例です。
+
+ただしこの玩具は本物と一つ意味論が違います。本体を文字列のまま保存して実行時に再解釈するので、参照する
+語を**あとから再定義すると挙動が変わる**（遅束縛）のです。本物の
+Forth は定義の時点で辞書を引き、本体を**アドレスの列にコンパイル**
+するので、再定義前にコンパイルされた語は旧定義を使い続けます
+（早束縛）——「埋もれるが消えない」という先述の辞書の意味論は、
+このコンパイル時解決から来ています。玩具と本物の差分そのものが
+教材になる好例です。
+
 ## コンパイラはたった一つのフラグ
 
 Forth には「実行モード」と「コンパイルモード」があり、その切り替えは

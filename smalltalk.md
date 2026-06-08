@@ -50,6 +50,28 @@ graph LR
     OT -.become: 後.-> B["新オブジェクト b"]
 ```
 
+仕組みは数行で確かめられます。
+
+```ruby
+# オブジェクトテーブルがあれば become: は表の 2 マス交換
+class ObjectTable
+  def initialize = @slots = []
+  def register(obj) = (@slots << obj; @slots.size - 1)  # 「参照」＝表の添字
+  def deref(handle) = @slots[handle]
+  def become!(h1, h2)
+    @slots[h1], @slots[h2] = @slots[h2], @slots[h1]     # これだけ。O(1)
+  end
+end
+
+table = ObjectTable.new
+a = table.register("old object")
+b = table.register("new object")
+ref1, ref2 = a, a            # プログラムのあちこちに散らばった a への参照
+table.become!(a, b)
+p table.deref(ref1)          # => "new object"
+p table.deref(ref2)          # => "new object"  全参照が一斉に切り替わった
+```
+
 「値の表現」の章で触れた**ハンドル**（一段の間接参照）の威力が
 最も劇的に現れた例です。間接参照は読みのたびに 1 ホップの税金を
 取りますが、「全参照の一斉更新」というありえない操作を自明にする。
