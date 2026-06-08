@@ -64,6 +64,8 @@
 赤黒木 [](#cite:guibas1978)、重み平衡木 [](#cite:adams1993)、
 B木 [](#cite:bayer1972)、
 HAMT [](#cite:bagwell2001)、フィンガーツリー [](#cite:hinze2006)、
+簡潔データ構造の起点 [](#cite:jacobson1989) と実用的な教科書
+[](#cite:navarro2016)、FM-index [](#cite:ferragina2000)、
 浮動小数点数の印字 [](#cite:steele1990) [](#cite:loitsch2010)
 [](#cite:adams2018)、SipHash [](#cite:aumasson2012)、
 正規表現とオートマトン [](#cite:thompson1968) [](#cite:cox2007)

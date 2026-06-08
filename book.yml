@@ -24,6 +24,7 @@ chapters:
       - hashes.md
       - lists.md
       - trees.md
+      - succinct.md
       - objects.md
       - closures.md
       - lazy.md
