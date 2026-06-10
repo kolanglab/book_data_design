@@ -123,7 +123,7 @@ def word_count(text)
 end
 
 p word_count("the cat sat on the mat")
-# => {"the"=>2, "cat"=>1, "sat"=>1, "on"=>1, "mat"=>1}
+# => {"the" => 2, "cat" => 1, "sat" => 1, "on" => 1, "mat" => 1}
 ```
 
 この数行のなかにも、本書で扱うデータ構造がいくつも顔を出しています。
