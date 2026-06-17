@@ -71,7 +71,7 @@ HAMT [](#cite:bagwell2001)、フィンガーツリー [](#cite:hinze2006)、
 正規表現とオートマトン [](#cite:thompson1968) [](#cite:cox2007)
 [](#cite:cox2009)、Lua の実装 [](#cite:ierusalimschy2005)、
 遅延評価の実装（STG）[](#cite:peytonjones1992) と思想
-[](#cite:hughes1989)、コレクションの格納戦略 [](#cite:bolz2013) ——
+[](#cite:hughes1989)、コレクションの格納戦略 [](#cite:bolz2013)。
 いずれも短く読みやすいものが多く、一次資料にあたる練習にも最適です。
 
 ## 個性派言語たち（第III部）の原典
